@@ -16,6 +16,7 @@
     "express-handlebars": "^4.0.4",
     "express-session": "^1.17.1",
     "randomstring": "^1.1.5",
+    "socket.io": "^2.3.0",
     "spotify-web-api-node": "^4.0.0"
   }
 }

@@ -1,3 +1,8 @@
+body {
+  background-color: #363434 !important;
+  height: 100vh;
+}
+
 .main h3 {
   margin-top: 1rem;
   font-size: 48px;
@@ -8,4 +13,13 @@
   font-size: 38px;
   margin-top: 1rem;
   margin-bottom: 2rem;
+}
+
+.navbar {
+  font-size: 80px;
+  background-color: #5c5757 !important;
+}
+
+hr {
+  border-top: 10px solid #8c8b8b;
 }

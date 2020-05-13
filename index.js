@@ -3,11 +3,13 @@ const bodyParser = require("body-parser");
 const expressHbs = require("express-handlebars");
 const path = require("path");
 const app = express();
-const spotify = require("./routes/spotify");
+const spotify = require("./routes/new-spotify");
 const navigation = require("./routes/navigation");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const mongoConnect = require("./utils/database").mongoConnect;
+const socketio = require("socket.io");
+const http = require("http");
 
 //Sessions store
 const store = new MongoDBStore({
@@ -38,8 +40,12 @@ app.use(
 //Static files (css, js)
 app.use(express.static(path.join(__dirname, "public")));
 
+//Socket
+const server = http.createServer(app); // a biblioteca http entra exatamente aqui
+io = socketio(server); // associando a instância do socketio com o seu servidor
+
 //Routes
-app.use("/spotify", spotify);
+app.use("/spotify", new spotify(io).router);
 app.use("/navigation", navigation);
 
 app.use("/", (req, res) => {
@@ -59,5 +65,5 @@ app.use("/", (req, res) => {
 });
 
 mongoConnect(() => {
-  app.listen(8080, "192.168.0.105");
+  server.listen(8080, "192.168.0.105");
 });

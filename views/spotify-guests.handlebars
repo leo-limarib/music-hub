@@ -8,18 +8,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="http://192.168.0.105:8080/socket.io/socket.io.js"></script>
 </head>
 
 <body>
-    <div class="container-fluid" style="padding: 0;">
-        <div class="row">
-            <div class="col-12 main" style="margin: 0 auto; background-color: gray; text-align: center;">
-                <h3>Pesquisar música:</h3>
-                <input type="text" placeholder="Nome da música" id="music-name">
-                <div id="tracks">
-                </div>
-            </div>
-        </div>
+    <nav class="navbar fixed-bottom navbar-light">
+        <i class="fas fa-home" style="margin-left: 12rem; margin-top: 1rem; margin-bottom: 1rem;"
+            onclick="showHome()"></i>
+        <i class="fas fa-search" style="margin-right: 12rem;" onclick="showSearch()"></i>
+    </nav>
+    <div class="container-fluid" style="padding: 0;" id="main-body">
     </div>
     <script src="/scripts/player-guests.js"></script>
 </body>

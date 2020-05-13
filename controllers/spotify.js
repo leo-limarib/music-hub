@@ -1,6 +1,14 @@
 const SpotifyWebApi = require("spotify-web-api-node");
 var queueController = require("./queue");
 
+exports.setIo = (io) => {
+  queueController.setIo(io);
+};
+
+exports.playingNow = () => {
+  return queueController.nowPlaying();
+};
+
 var spotifyApi = new SpotifyWebApi({
   clientId: "b2a6860195204e8c89ea8cc1241b836d",
   clientSecret: "a84a59a1ecaf42a1aa805706139a943d",
@@ -172,9 +180,10 @@ exports.searchTracks = (req, res) => {
 
 /**
  * Add a song to the user queue.
- * @param {req.params.songUri} songUri The spotify uri to the track.
- * @param {req.params.songName} songName The song name
- * @param {req.params.durationMs} durationms The song duration in milliseconds
+ * @param {req.body.songUri} songUri The spotify uri to the track.
+ * @param {req.body.songName} songName The song name
+ * @param {req.body.durationMs} durationMs The song duration in milliseconds
+ * @param {req.body.coverUrl} coverUrl
  * @example 192.168.0.105:8080/queue/add-to-queue/a61s5d1s6af1sad1
  * @returns {Object} Returns a json with a message (error or sucess).
  */
@@ -182,13 +191,15 @@ exports.addTrackToQueue = (req, res) => {
   if (req.session.user != undefined) {
     queueController.add(
       req.session.user,
-      req.params.songName,
-      req.params.songUri,
-      req.params.durationMs
+      req.body.songName,
+      req.body.songUri,
+      req.body.durationMs,
+      req.body.coverUrl,
+      req.body.artist
     );
     if (process.env.STATUS == "off") {
       return spotifyApi
-        .addSongToQueue(req.params.songUri, process.env.DEVICE)
+        .addSongToQueue(req.body.songUri, process.env.DEVICE)
         .then(() => {
           spotifyApi
             .skipToNext()
@@ -213,7 +224,7 @@ exports.addTrackToQueue = (req, res) => {
         });
     } else {
       return spotifyApi
-        .addSongToQueue(req.params.songUri, process.env.DEVICE)
+        .addSongToQueue(req.body.songUri, process.env.DEVICE)
         .then(() => {
           return res.json({ message: "Música adicionada à fila com sucesso." });
         })
