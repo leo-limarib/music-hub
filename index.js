@@ -57,7 +57,7 @@ app.use("/", (req, res) => {
         return res.redirect("/spotify/master");
       }
     } else {
-      return res.render("spotify-guests", { layout: false });
+      return res.redirect("/navigation/guests");
     }
   } else {
     return res.render("register-guest", { layout: false });
@@ -65,5 +65,5 @@ app.use("/", (req, res) => {
 });
 
 mongoConnect(() => {
-  server.listen(8080, "192.168.0.105");
+  server.listen(process.env.PORT, process.env.IP);
 });

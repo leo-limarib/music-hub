@@ -9,12 +9,6 @@ exports.playingNow = () => {
   return queueController.nowPlaying();
 };
 
-var spotifyApi = new SpotifyWebApi({
-  clientId: "b2a6860195204e8c89ea8cc1241b836d",
-  clientSecret: "a84a59a1ecaf42a1aa805706139a943d",
-  redirectUri: "http://localhost:8080",
-});
-
 var scopes = [
   "user-read-private",
   "user-read-email",
@@ -27,7 +21,7 @@ var spotifyApi = new SpotifyWebApi();
 var spotifyApi = new SpotifyWebApi({
   clientId: "be2c978836a64f48abddd38756001b7b",
   clientSecret: "8b7daffe461d4709baca8031560ceae3",
-  redirectUri: "http://192.168.0.105:8080/spotify/getacesstoken",
+  redirectUri: `http://${process.env.IP}:${process.env.PORT}/spotify/getacesstoken`,
 });
 
 spotifyApi.clientCredentialsGrant().then(

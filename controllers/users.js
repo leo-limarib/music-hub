@@ -2,7 +2,7 @@ exports.registerUser = (req, res) => {
   try {
     req.session.user = req.body["guest-name"];
     req.session.type = "guest";
-    return res.render("spotify-guests", { layout: false });
+    return res.redirect("/navigation/guests");
   } catch (e) {
     console.log(e);
     return res

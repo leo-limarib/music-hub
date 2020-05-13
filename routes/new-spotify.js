@@ -67,7 +67,7 @@ class Spotify {
         if (req.session.user != undefined) {
           if (req.session.type == "host")
             return res.render("spotify-master", { layout: false });
-          else return res.render("spotify-guests", { layout: false });
+          else return res.redirect("/navigation/guests");
         } else {
           return res.render("register-guest", { layout: false });
         }
