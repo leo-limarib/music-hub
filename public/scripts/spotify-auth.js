@@ -1,9 +1,9 @@
-function authorizeApp(hostPassword) {
+function authorizeApp(hostPassword, hostName) {
   $.ajax({
-    type: "GET",
-    url: window.location.origin + `/spotify/getuseracess/${hostPassword}`,
+    type: "POST",
+    url: window.location.origin + `/spotify/host`,
     contentType: "application/json",
-    data: null,
+    data: JSON.stringify({ hostName: hostName, hostPassword: hostPassword }),
     dataType: "json",
     success: (data) => {
       window.location.replace(data.url);
@@ -16,6 +16,6 @@ function authorizeApp(hostPassword) {
 
 $(document).ready(() => {
   $("#host-password").on("change", () => {
-    authorizeApp($("#host-password").val());
+    authorizeApp($("#host-password").val(), $("#host-name").val());
   });
 });

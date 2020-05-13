@@ -1,19 +1,5 @@
 function getInviteUrl() {
-  $.ajax({
-    type: "GET",
-    url: window.location.origin + `/spotify/getinviteurl`,
-    contentType: "application/json",
-    data: null,
-    dataType: "json",
-    success: (data) => {
-      $("#invite-url").text(
-        window.location.origin + `/spotify/guests/${data.passport}`
-      );
-    },
-    error: (err) => {
-      console.log(err);
-    },
-  });
+  $("#invite-url").text(window.location.origin + `/navigation/guests`);
 }
 
 function selectTrack(trackUri) {

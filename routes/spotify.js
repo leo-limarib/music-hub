@@ -3,7 +3,6 @@ const router = express.Router();
 const SpotifyWebApi = require("spotify-web-api-node");
 require("dotenv").config();
 const hostPassword = process.env.HOST_PASSWORD;
-const randomstring = require("randomstring");
 
 var scopes = [
   "user-read-private",
@@ -30,40 +29,30 @@ spotifyApi.clientCredentialsGrant().then(
   }
 );
 
-router.get("/getinviteurl", (req, res) => {
-  return res.json({ passport: process.env.HOST_PASSPORT });
-});
-
-router.get("/master", (req, res) => {
-  return res.render("spotify-master", { layout: false });
-});
-
-/**
- * Protection to the guests page. Only people with the token
- * can enter the room.
- */
-router.get("/guests/:passport", (req, res) => {
+router.post("/guests/register", (req, res) => {
   try {
-    if (req.params.passport == process.env.HOST_PASSPORT) {
-      return res.render("spotify-guests", { layout: false });
-    } else {
-      return res.status(401).json({ message: "Token de autorização inválido" });
-    }
+    req.session.user = req.body["guest-name"];
+    req.session.type = "guest";
+    return res.render("spotify-guests", { layout: false });
   } catch (e) {
     console.log(e);
     return res
       .status(500)
-      .json({ message: "Erro ao tentar conectar-se na sala." });
+      .json({ message: "Erro ao tentar registrar-se na sala." });
   }
 });
 
 /**
  * Protection to the host page, password saved on .env file
+ * req.body.hostPassword
+ * req.body.hostName
  */
-router.get("/getuseracess/:hostPassword", (req, res, next) => {
+router.post("/host", (req, res, next) => {
   try {
-    if (req.params.hostPassword == hostPassword) {
+    if (req.body.hostPassword == hostPassword) {
       var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+      req.session.user = req.body.hostName;
+      req.session.type = "host";
       return res.json({ url: authorizeURL });
     } else {
       return res.status(401).json({ message: "Senha de host inválida." });
@@ -73,6 +62,34 @@ router.get("/getuseracess/:hostPassword", (req, res, next) => {
     return res.status(500).json({
       message: "Erro ao tentar autorizar aplicativo.",
     });
+  }
+});
+
+router.get("/master", (req, res) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    if (process.env.HOST != "null") {
+      return res.render("spotify-master", { layout: false });
+    } else {
+      var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+      return res.redirect(authorizeURL);
+    }
+  } else {
+    return res.render("register-guest", { layout: false });
+  }
+});
+
+router.get("/host", (req, res) => {
+  if (process.env.HOST == "null") {
+    var authorizeURL = spotifyApi.createAuthorizeURL(scopes, state);
+    return res.redirect(authorizeURL);
+  } else {
+    if (req.session.user != undefined) {
+      if (req.session.type == "host")
+        return res.render("spotify-master", { layout: false });
+      else return res.render("spotify-guests", { layout: false });
+    } else {
+      return res.render("register-guest", { layout: false });
+    }
   }
 });
 
@@ -103,7 +120,7 @@ router.get("/getacesstoken", (req, res, next) => {
       );
 
       process.env.HOST = "Unkown";
-      return res.redirect("/selectdevice");
+      return res.redirect("/spotify/devices/select");
     },
     function (err) {
       console.log("Something went wrong!", err);
@@ -127,16 +144,29 @@ router.get("/artist/albums/:artistId", (req, res, next) => {
     });
 });
 
+router.get("/devices/select", (req, res) => {
+  if (process.env.HOST == "null") {
+    return res.render("host-spotify", { layout: false });
+  } else {
+    return res.render("select-device", { layout: false });
+  }
+});
+
 /**
  * Set the device where the music will be played.
  * @param {string} deviceId The target device id
  * @example 192.168.0.105:8080/setdevice/s65ad1sad1s65ad1
  * @returns {Object} returns a json with a sucess message.
  */
-router.post("/setdevice/:deviceId", (req, res, next) => {
-  process.env.DEVICE = req.params.deviceId;
-  process.env.HOST_PASSPORT = randomstring.generate(16);
-  return res.json({ message: "Dispositivo selecionado com sucesso." });
+router.post("/devices/:deviceId", (req, res, next) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    process.env.DEVICE = req.params.deviceId;
+    return res.json({ message: "Dispositivo selecionado com sucesso." });
+  } else {
+    return res
+      .status(401)
+      .json({ message: "Você não tem permissão para realizar essa tarefa." });
+  }
 });
 
 /**
@@ -144,15 +174,21 @@ router.post("/setdevice/:deviceId", (req, res, next) => {
  * @example 192.168.0.105:8080/spotify/getmydevices
  * @returns {Object} Returns a json with the devices list.
  */
-router.get("/getmydevices", (req, res, next) => {
-  spotifyApi
-    .getMyDevices()
-    .then((devices) => {
-      return res.send(devices);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+router.get("/devices", (req, res, next) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    spotifyApi
+      .getMyDevices()
+      .then((devices) => {
+        return res.send(devices);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    return res
+      .status(401)
+      .json({ message: "Você não tem permissão para realizar essa tarefa." });
+  }
 });
 
 /**
@@ -162,17 +198,23 @@ router.get("/getmydevices", (req, res, next) => {
  * @returns {Object} Returns a json with the error or sucess message.
  */
 router.post("/player/play/:deviceId", (req, res, next) => {
-  spotifyApi
-    .play({ device_id: req.params.deviceId })
-    .then(() => {
-      return res.json({ message: "Playback status switched!" });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res
-        .status(500)
-        .json({ message: "Error while trying to switch playback status." });
-    });
+  if (req.session.user != undefined && req.session.type == "host") {
+    spotifyApi
+      .play({ device_id: req.params.deviceId })
+      .then(() => {
+        return res.json({ message: "Playback status switched!" });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res
+          .status(500)
+          .json({ message: "Error while trying to switch playback status." });
+      });
+  } else {
+    return res
+      .status(401)
+      .json({ message: "Você não tem permissão para realizar essa tarefa." });
+  }
 });
 
 /**
@@ -200,17 +242,81 @@ router.get("/tracks/search/:trackName", (req, res) => {
  * @returns {Object} Returns a json with a message (error or sucess).
  */
 router.post("/queue/add-to-queue/:songUri", (req, res) => {
-  spotifyApi
-    .addSongToQueue(req.params.songUri, process.env.DEVICE)
-    .then(() => {
-      return res.json({ message: "Música adicionada à fila com sucesso." });
-    })
-    .catch((err) => {
-      console.log(err);
-      return res
-        .status(500)
-        .json({ message: "Erro ao tentar adicionar música a fila." });
-    });
+  if (req.session.user != undefined) {
+    if ((req.session.type = "host" && process.env.STATUS == "off")) {
+      spotifyApi
+        .addSongToQueue(req.params.songUri, process.env.DEVICE)
+        .then(() => {
+          spotifyApi
+            .skipToNext()
+            .then(() => {
+              process.env.status = "on";
+              return res.json({
+                message: "Servidor inicializado com sucesso.",
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+              return res
+                .status(500)
+                .json({ message: "Erro ao tentar iniciar sessão." });
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          return res
+            .status(500)
+            .json({ message: "Erro ao tentar iniciar sessão." });
+        });
+    } else {
+      spotifyApi
+        .addSongToQueue(req.params.songUri, process.env.DEVICE)
+        .then(() => {
+          return res.json({ message: "Música adicionada à fila com sucesso." });
+        })
+        .catch((err) => {
+          console.log(err);
+          return res
+            .status(500)
+            .json({ message: "Erro ao tentar adicionar música a fila." });
+        });
+    }
+  } else {
+    return res.status(401).json({ message: "Não autorizado." });
+  }
 });
+
+/* 
+router.post("/start/:songUri", (req, res) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    spotifyApi
+      .addSongToQueue(req.params.songUri, process.env.DEVICE)
+      .then(() => {
+        spotifyApi
+          .skipToNext()
+          .then(() => {
+            process.env.status = "on";
+            return res.json({ message: "Servidor inicializado com sucesso." });
+          })
+          .catch((err) => {
+            console.log(err);
+            return res
+              .status(500)
+              .json({ message: "Erro ao tentar iniciar sessão." });
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res
+          .status(500)
+          .json({ message: "Erro ao tentar iniciar sessão." });
+      });
+  } else {
+    return res.status(400).json({
+      message: "Você não é o host.",
+    });
+  }
+});
+*/
 
 module.exports = router;

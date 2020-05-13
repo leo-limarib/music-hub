@@ -1,7 +1,7 @@
 function selectDevice(deviceId) {
   $.ajax({
     type: "POST",
-    url: window.location.origin + `/spotify/setdevice/${deviceId}`,
+    url: window.location.origin + `/spotify/devices/${deviceId}`,
     contentType: "application/json",
     data: null,
     dataType: "json",
@@ -17,7 +17,7 @@ function selectDevice(deviceId) {
 $(document).ready(() => {
   $.ajax({
     type: "GET",
-    url: window.location.origin + `/spotify/getmydevices`,
+    url: window.location.origin + `/spotify/devices`,
     contentType: "application/json",
     data: null,
     dataType: "json",
