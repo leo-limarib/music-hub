@@ -2,10 +2,12 @@ function getInviteUrl() {
   $("#invite-url").text(window.location.origin + `/navigation/guests`);
 }
 
-function selectTrack(trackUri) {
+function selectTrack(trackName, trackUri, trackDuration) {
   $.ajax({
     type: "POST",
-    url: window.location.origin + `/spotify/queue/add-to-queue/${trackUri}`,
+    url:
+      window.location.origin +
+      `/spotify/queue/add-to-queue/${trackName}/${trackUri}/${trackDuration}`,
     contentType: "application/json",
     data: null,
     dataType: "json",
@@ -30,7 +32,7 @@ function getMusicsByName(musicName) {
       data.body.tracks.items.forEach((track) => {
         console.log(track);
         $("#tracks").append(
-          `<div style="margin: 1rem;" onclick="selectTrack('${track.uri}')"><img src="${track.album.images[2].url}"> <br>Nome: ${track.name} <br>Artista: ${track.artists[0].name}<hr></div>`
+          `<div style="margin: 1rem;" onclick="selectTrack('${track.name}', '${track.uri}', '${track.duration_ms}')"><img src="${track.album.images[2].url}"> <br>Nome: ${track.name} <br>Artista: ${track.artists[0].name}<hr></div>`
         );
       });
     },
