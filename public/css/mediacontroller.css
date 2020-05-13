@@ -1,0 +1,9 @@
+button {
+  padding: 0.6rem;
+}
+button i {
+  font-size: 30px;
+}
+input {
+  width: 25%;
+}
