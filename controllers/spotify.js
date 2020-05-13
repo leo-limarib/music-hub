@@ -186,8 +186,8 @@ exports.addTrackToQueue = (req, res) => {
       req.params.songUri,
       req.params.durationMs
     );
-    if (req.session.type == "host" && process.env.STATUS == "off") {
-      spotifyApi
+    if (process.env.STATUS == "off") {
+      return spotifyApi
         .addSongToQueue(req.params.songUri, process.env.DEVICE)
         .then(() => {
           spotifyApi
@@ -212,7 +212,7 @@ exports.addTrackToQueue = (req, res) => {
             .json({ message: "Erro ao tentar iniciar sessão." });
         });
     } else {
-      spotifyApi
+      return spotifyApi
         .addSongToQueue(req.params.songUri, process.env.DEVICE)
         .then(() => {
           return res.json({ message: "Música adicionada à fila com sucesso." });
