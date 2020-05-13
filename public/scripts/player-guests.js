@@ -28,7 +28,17 @@ function getMusicsByName(musicName) {
       data.body.tracks.items.forEach((track) => {
         console.log(track);
         $("#tracks").append(
-          `<div style="margin: 1rem;" onclick="selectTrack('${track.name}', '${track.uri}', '${track.duration_ms}')"><img src="${track.album.images[2].url}"> <br>Nome: ${track.name} <br>Artista: ${track.artists[0].name}<hr></div>`
+          //(\'' + $valuationId + '\',\'' + $user + '\')
+          `<div class="container-fluid" onclick="selectTrack('${track.name.replace(
+            "'",
+            ""
+          )}', '${track.uri}', '${
+            track.duration_ms
+          }')"><div class="row"><div class="col-6"><img src="${
+            track.album.images[1].url
+          }"></div><div class="col-6" style="font-size: 46px;">Nome: ${
+            track.name
+          } <br>Artista: ${track.artists[0].name}</div></div><hr></div>`
         );
       });
     },

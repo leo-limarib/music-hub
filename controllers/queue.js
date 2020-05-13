@@ -5,11 +5,11 @@ var SIZE = 50;
 /**
  * Removes the music in the first place (called when the song is done playing)
  */
-removeFirstPlace = (queue, callback) => {
+removeFirstPlace = () => {
   queue.shift();
   if (queue.length > 0) {
     console.log(`Next song: ${queue[0].name}`);
-    callback();
+    play();
   } else {
     var api = spotify.getApi();
     process.env.STATUS = "off";
@@ -18,8 +18,10 @@ removeFirstPlace = (queue, callback) => {
 };
 
 play = () => {
-  setTimeout(removeFirstPlace, queue[0].duration, queue, play);
+  setTimeout(removeFirstPlace, queue[0].duration);
 };
+
+songInQueue = (songName) => {};
 
 /**
  * Add a song to the play queue.

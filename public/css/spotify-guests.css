@@ -1,0 +1,11 @@
+.main h3 {
+  margin-top: 1rem;
+  font-size: 48px;
+}
+
+.main input {
+  width: 60%;
+  font-size: 38px;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
