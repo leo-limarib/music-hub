@@ -14,7 +14,7 @@ const http = require("http");
 //Sessions store
 const store = new MongoDBStore({
   uri: "mongodb://localhost:27017/Musichub",
-  collection: "sessions",
+  collection: process.env.SESSIONS_DB_NAME,
 });
 
 //Set the view engine to use handlebars

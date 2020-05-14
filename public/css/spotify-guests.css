@@ -1,6 +1,7 @@
 body {
   background-color: #363434 !important;
   height: 100vh;
+  font-family: "Roboto", sans-serif;
 }
 
 .main h3 {
@@ -22,4 +23,18 @@ body {
 
 hr {
   border-top: 10px solid #8c8b8b;
+}
+
+.queue-button {
+  padding: 0.75rem;
+  margin-top: 4rem;
+  font-size: 38px;
+}
+
+.empty-space {
+  padding: 5rem;
+}
+
+.nav-selected {
+  color: #43e4ff !important;
 }

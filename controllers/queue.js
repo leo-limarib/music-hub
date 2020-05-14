@@ -4,6 +4,20 @@ var SIZE = 50;
 var notifyio = null;
 
 /**
+ * Verify if the song is no the queue.
+ * @param {string} song the name of the song
+ * @returns {Promise} reject if the song is already on the queue, resolve if is not.
+ */
+songInQueue = (song) => {
+  return new Promise((resolve, reject) => {
+    queue.forEach((music) => {
+      if (music.name == song) reject();
+    });
+    resolve();
+  });
+};
+
+/**
  * Removes the music in the first place (called when the song is done playing)
  */
 removeFirstPlace = () => {
@@ -34,22 +48,35 @@ play = () => {
  * @returns {Promise} returns a promise
  */
 exports.add = (user, musicName, musicUri, musicDuration, coverUrl, artist) => {
-  if (queue.length <= SIZE) {
-    queue.push({
-      user: user,
-      name: musicName,
-      uri: musicUri,
-      duration: musicDuration,
-      coverUrl: coverUrl,
-      artist: artist,
-    });
-    notifyio.emit("playing", {
-      queue: queue,
-    });
-    if (queue.length == 1) {
-      play();
+  return new Promise((resolve, reject) => {
+    if (queue.length <= SIZE) {
+      songInQueue(musicName)
+        .then(() => {
+          queue.push({
+            user: user,
+            name: musicName,
+            uri: musicUri,
+            duration: musicDuration,
+            coverUrl: coverUrl,
+            artist: artist,
+            status: "ok",
+          });
+          notifyio.emit("playing", {
+            queue: queue,
+          });
+          if (queue.length == 1) {
+            play();
+          }
+          resolve();
+        })
+        .catch(() => {
+          console.log("Essa música já está na fila.");
+          reject();
+        });
+    } else {
+      reject();
     }
-  }
+  });
 };
 
 exports.nowPlaying = () => {

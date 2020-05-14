@@ -10,7 +10,11 @@ class Spotify {
     spotifyController.setIo(io);
     this.router = router;
 
-    router.post("/guests/register", usersController.registerUser);
+    router.post(
+      "/guests/register",
+      usersController.userExist("body", "guest-name"),
+      usersController.registerUser
+    );
 
     /**
      * Protection to the host page, password saved on .env file

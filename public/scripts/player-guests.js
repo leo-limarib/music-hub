@@ -15,7 +15,7 @@ function selectTrack(trackName, trackUri, trackDuration, coverUrl, artist) {
       alert(data.message);
     },
     error: (err) => {
-      console.log(err);
+      alert(err.responseJSON.message);
     },
   });
 }
@@ -32,8 +32,13 @@ function getMusicsByName(musicName) {
       data.body.tracks.items.forEach((track) => {
         console.log(track);
         $("#tracks").append(
-          //(\'' + $valuationId + '\',\'' + $user + '\')
-          `<div class="container-fluid" onclick="selectTrack('${track.name.replace(
+          `<div class="container-fluid"><div class="row"><div class="col-4"><img src="${
+            track.album.images[1].url
+          }"></div><div class="col-6" style="font-size: 40px; text-align: left;">${
+            track.name
+          } <br>${
+            track.artists[0].name
+          }</div><div class="col-2"><button class="queue-button" onclick="selectTrack('${track.name.replace(
             /[^a-zA-Z ]/g,
             ""
           )}', '${track.uri}', '${track.duration_ms}', '${
@@ -41,11 +46,7 @@ function getMusicsByName(musicName) {
           }', '${track.artists[0].name.replace(
             /[^a-zA-Z ]/g,
             ""
-          )}')"><div class="row"><div class="col-6"><img src="${
-            track.album.images[1].url
-          }"></div><div class="col-6" style="font-size: 46px;">Nome: ${
-            track.name
-          } <br>Artista: ${track.artists[0].name}</div></div><hr></div>`
+          )}')"><i class="far fa-share-square"></i></button></div></div><hr></div>`
         );
       });
     },
@@ -56,6 +57,8 @@ function getMusicsByName(musicName) {
 }
 
 function showSearch() {
+  $(".fa-home").css("color", "#EFECEC");
+  $(".fa-search").css("color", "#43E4FF");
   $("#main-body").empty();
   $("#main-body").append(`<div class="row">
     <div class="col-12 main" style="margin: 0 auto; background-color: gray; text-align: center;">
@@ -72,6 +75,8 @@ function showSearch() {
 }
 
 function showHome() {
+  $(".fa-home").css("color", "#43E4FF");
+  $(".fa-search").css("color", "#EFECEC");
   $("#main-body").empty();
   $("#main-body").append(`<div class="row">
     <div class="col-12 main" style="margin: 0 auto; background-color: gray;">
@@ -91,7 +96,7 @@ function showHome() {
 </div><div class="row"><div class="col-12" style="margin-top: 4rem; color: white; text-align: center;"><h1 style="margin-top: 4rem; margin-bottom: 1rem; color: white;">Fila:</h1>
 <div id="queue"></div></div></div>`);
 
-  const socket = io("http://192.168.0.105:8080/"); // conectando no servidor do socketio
+  const socket = io(window.location.origin); // conectando no servidor do socketio
 
   socket.on("playing", (data) => {
     $("#now-playing").text(`${data.queue[0].name}`);
@@ -106,7 +111,7 @@ function showHome() {
         `<div style="border-bottom: 2px solid gray; border-top: 2px solid gray;">
             <div class="containuer-fluid" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
                 <div class="row" style="padding: 0;">
-                    <div class="col-5" style="width: 80%; height: 80%; margin: 0;">
+                    <div class="col-5" style="width: 70%; height: 70%; margin: 0;">
                         <img src="${m.coverUrl}" style="width: 75%; height: 75%; margin: 0;">
                     </div>
                     <div class="col-7" style="width: 80%; height: 80%; margin: 0; text-align: left;">
