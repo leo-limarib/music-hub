@@ -52,7 +52,7 @@ app.use("/", (req, res) => {
   if (req.session.user != undefined) {
     if (req.session.type == "host") {
       if (process.env.DEVICE != "null") {
-        return res.render("spotify-master", { layout: false });
+        return res.redirect("/spotify/master");
       } else {
         return res.redirect("/spotify/master");
       }

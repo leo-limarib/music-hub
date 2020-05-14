@@ -45,7 +45,12 @@ class Spotify {
     router.get("/master", (req, res) => {
       if (req.session.user != undefined && req.session.type == "host") {
         if (process.env.HOST != "null") {
-          return res.render("spotify-master", { layout: false });
+          return res.render("spotify-master", {
+            layout: false,
+            user: req.session.user,
+            ip: process.env.IP,
+            port: process.env.PORT,
+          });
         } else {
           var api = spotifyController.getApi();
           var state = spotifyController.getState();
@@ -70,7 +75,7 @@ class Spotify {
       } else {
         if (req.session.user != undefined) {
           if (req.session.type == "host")
-            return res.render("spotify-master", { layout: false });
+            return res.redirect("/spotify/master");
           else return res.redirect("/navigation/guests");
         } else {
           return res.render("register-guest", { layout: false });
@@ -112,6 +117,11 @@ class Spotify {
     router.get("/tracks/search/:trackName", spotifyController.searchTracks);
 
     router.post("/queue/add-to-queue", spotifyController.addTrackToQueue);
+
+    router.post(
+      "/queue/remove-from-queue",
+      spotifyController.removeTrackFromQueue
+    );
   }
 }
 

@@ -107,22 +107,24 @@ function showHome() {
     data.queue.shift();
     $("#queue").empty();
     data.queue.forEach((m) => {
-      $("#queue").append(
-        `<div style="border-bottom: 2px solid gray; border-top: 2px solid gray;">
-            <div class="containuer-fluid" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
-                <div class="row" style="padding: 0;">
-                    <div class="col-5" style="width: 70%; height: 70%; margin: 0;">
-                        <img src="${m.coverUrl}" style="width: 75%; height: 75%; margin: 0;">
-                    </div>
-                    <div class="col-7" style="width: 80%; height: 80%; margin: 0; text-align: left;">
-                        <p style="font-size: 44px; margin: 0;">${m.name}</p>
-                        <p style="font-size: 44px; margin: 0;">${m.artist}</p>
-                        <p style="font-size: 44px; margin: 0; color: #43E4FF;">${m.user}</p>
-                    </div>
-                </div>
-            </div>
-        <div>`
-      );
+      if (m.status == "ok") {
+        $("#queue").append(
+          `<div style="border-bottom: 2px solid gray; border-top: 2px solid gray;">
+              <div class="containuer-fluid" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+                  <div class="row" style="padding: 0;">
+                      <div class="col-5" style="width: 70%; height: 70%; margin: 0;">
+                          <img src="${m.coverUrl}" style="width: 75%; height: 75%; margin: 0;">
+                      </div>
+                      <div class="col-7" style="width: 80%; height: 80%; margin: 0; text-align: left;">
+                          <p style="font-size: 44px; margin: 0;">${m.name}</p>
+                          <p style="font-size: 44px; margin: 0;">${m.artist}</p>
+                          <p style="font-size: 44px; margin: 0; color: #43E4FF;">${m.user}</p>
+                      </div>
+                  </div>
+              </div>
+          <div>`
+        );
+      }
     });
   });
 }

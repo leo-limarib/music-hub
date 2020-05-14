@@ -38,3 +38,9 @@ hr {
 .nav-selected {
   color: #43e4ff !important;
 }
+
+#master-config-title {
+  font-size: 48px;
+  color: #43e4ff;
+  margin: 1rem;
+}

@@ -3,18 +3,24 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/css/mediacontroller.css">
+    <link rel="stylesheet" href="/css/player.css">
     <script src="https://use.fontawesome.com/releases/v5.3.0/js/all.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="http://{{ip}}:{{port}}/socket.io/socket.io.js"></script>
 </head>
 
 <body>
-    <h2>URL para convidados: <a href="#" id="invite-url"></a></h2>
-    <h3>Pesquisar música:</h3>
-    <input type="text" placeholder="Nome da música" id="music-name">
-    <div id="tracks">
-
+    <nav class="navbar fixed-bottom navbar-light">
+        <i class="fas fa-home" style="margin-left: 9rem; margin-top: 1rem; margin-bottom: 1rem; color: #EFECEC;"
+            onclick="showHome()"></i>
+        <i class="fas fa-search" style="margin-right: 0rem; color: #EFECEC;" onclick="showSearch()"></i>
+        <i class="fas fa-cogs" style="margin-right: 9rem; color: #EFECEC;" onclick="showConfiguration()"></i>
+    </nav>
+    <div id="main-body">
     </div>
+    <div class="empty-space"></div>
     <script src="/scripts/player-master.js"></script>
 </body>
 

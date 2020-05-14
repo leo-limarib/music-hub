@@ -11,7 +11,7 @@ var notifyio = null;
 songInQueue = (song) => {
   return new Promise((resolve, reject) => {
     queue.forEach((music) => {
-      if (music.name == song) reject();
+      if (music.name == song && music.status == "ok") reject();
     });
     resolve();
   });
@@ -23,7 +23,20 @@ songInQueue = (song) => {
 removeFirstPlace = () => {
   queue.shift();
   if (queue.length > 0) {
-    play();
+    if (queue[0].status == "ok") {
+      play();
+    } else {
+      console.log(`PULANDO MÚSICA: ${queue[0].name}`);
+      var api = spotify.getApi();
+      api
+        .skipToNext()
+        .then(() => {
+          removeFirstPlace();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   } else {
     var api = spotify.getApi();
     process.env.STATUS = "off";
@@ -56,7 +69,7 @@ exports.add = (user, musicName, musicUri, musicDuration, coverUrl, artist) => {
             user: user,
             name: musicName,
             uri: musicUri,
-            duration: musicDuration,
+            duration: musicDuration, //delay to sinchronize with player
             coverUrl: coverUrl,
             artist: artist,
             status: "ok",
@@ -97,6 +110,21 @@ exports.setIo = (io) => {
       });
     }
   });
+
+  exports.removeSong = (songUri) => {
+    return new Promise((resolve, reject) => {
+      queue.forEach((song) => {
+        if (song.uri == songUri) {
+          song.status = "deleted";
+          notifyio.emit("playing", {
+            queue: queue,
+          });
+          resolve();
+        }
+      });
+      reject();
+    });
+  };
 
   console.log("io setted.");
 };

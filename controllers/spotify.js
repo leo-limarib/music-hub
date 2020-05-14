@@ -78,6 +78,11 @@ exports.getAccessToken = (req, res) => {
   );
 };
 
+/**
+ * Get a the artist albums list
+ * @param {string} req.params.artistId the artist spotify id
+ * @returns a array with the albums objects
+ */
 exports.getArtistAlbums = (req, res) => {
   spotifyApi
     .getArtistAlbums(req.params.artistId)
@@ -86,13 +91,15 @@ exports.getArtistAlbums = (req, res) => {
     })
     .catch((err) => {
       console.log(err);
+      return res.status(500).json({
+        message: "Erro ao tentar retornar lista de álbuns do artista.",
+      });
     });
 };
 
 /**
  * Set the device where the music will be played.
  * @param {string} deviceId The target device id
- * @example 192.168.0.105:8080/setdevice/s65ad1sad1s65ad1
  * @returns {Object} returns a json with a sucess message.
  */
 exports.setDevice = (req, res) => {
@@ -244,4 +251,23 @@ exports.addTrackToQueue = (req, res) => {
   }
 };
 
-exports.skipSong = (req, res) => {};
+/**
+ * Sign a song as "deleted" on the queue.
+ * @param {string} req.body.songUri the spotify uri for the song
+ */
+exports.removeTrackFromQueue = (req, res) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    queueController
+      .removeSong(req.body.songUri)
+      .then(() => {
+        return res.json({ message: "Música removida da fila com sucesso." });
+      })
+      .catch(() => {
+        return res
+          .status(500)
+          .json({ message: "Erro ao tentar remover música da fila." });
+      });
+  } else {
+    return res.status(401).json({ message: "Ação negada." });
+  }
+};
