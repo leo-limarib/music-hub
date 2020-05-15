@@ -92,7 +92,10 @@ function showConfiguration() {
   $("#main-body").empty();
   $("#main-body").append(`
   <p style="font-size: 52px; color: white; margin: 0; margin-left: 1rem;">Link para convidados:</p>
-  <p id="guests-url" style="font-size: 40px; color: white; margin: 0; margin-left: 1rem;"></p>`);
+  <p id="guests-url" style="font-size: 40px; color: white; margin: 0; margin-left: 1rem;"></p>
+  <a style="font-size: 40px; color: white;" href="${
+    window.location.origin + "/spotify/refreshtoken"
+  }">Atualizar token de acesso.</a>`);
   getInviteUrl();
   focusIcon($(".fa-cogs"), [$(".fa-search"), $(".fa-home")]);
 }

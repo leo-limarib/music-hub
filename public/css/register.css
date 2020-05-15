@@ -1,0 +1,20 @@
+body {
+  background-color: #363434 !important;
+  height: 100vh;
+  font-family: "Roboto", sans-serif;
+}
+
+.form-div {
+  margin: 0 auto;
+  background-color: #8c8b8b;
+  text-align: center;
+  font-size: 38px;
+  padding: 2rem 0;
+}
+
+button {
+  background-color: #43e4ff;
+  color: black;
+  border: 1px solid #43e4ff;
+  padding: 0.5rem;
+}

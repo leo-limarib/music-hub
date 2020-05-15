@@ -190,22 +190,22 @@ exports.searchTracks = (req, res) => {
  */
 exports.addTrackToQueue = (req, res) => {
   if (req.session.user != undefined) {
-    queueController
-      .add(
-        req.session.user,
-        req.body.songName,
-        req.body.songUri,
-        req.body.durationMs,
-        req.body.coverUrl,
-        req.body.artist
-      )
-      .then(() => {
-        if (process.env.STATUS == "off") {
-          return spotifyApi
-            .addSongToQueue(req.body.songUri, process.env.DEVICE)
+    if (process.env.STATUS == "off") {
+      return spotifyApi
+        .addSongToQueue(req.body.songUri, process.env.DEVICE)
+        .then(() => {
+          spotifyApi
+            .skipToNext()
             .then(() => {
-              spotifyApi
-                .skipToNext()
+              queueController
+                .add(
+                  req.session.user,
+                  req.body.songName,
+                  req.body.songUri,
+                  req.body.durationMs,
+                  req.body.coverUrl,
+                  req.body.artist
+                )
                 .then(() => {
                   process.env.STATUS = "on";
                   return res.json({
@@ -225,27 +225,45 @@ exports.addTrackToQueue = (req, res) => {
                 .status(500)
                 .json({ message: "Erro ao tentar iniciar sessão." });
             });
-        } else {
-          return spotifyApi
-            .addSongToQueue(req.body.songUri, process.env.DEVICE)
+        })
+        .catch((err) => {
+          console.log(err);
+          return res
+            .status(500)
+            .json({ message: "Erro ao tentar iniciar sessão." });
+        });
+    } else {
+      return spotifyApi
+        .addSongToQueue(req.body.songUri, process.env.DEVICE)
+        .then(() => {
+          queueController
+            .add(
+              req.session.user,
+              req.body.songName,
+              req.body.songUri,
+              req.body.durationMs,
+              req.body.coverUrl,
+              req.body.artist
+            )
             .then(() => {
               return res.json({
-                message: "Música adicionada à fila com sucesso.",
+                message: "Música adicionada a fila com sucesso.",
               });
             })
             .catch((err) => {
               console.log(err);
               return res
                 .status(500)
-                .json({ message: "Erro ao tentar adicionar música a fila." });
+                .json({ message: "Erro ao tentar iniciar sessão." });
             });
-        }
-      })
-      .catch(() => {
-        return res
-          .status(500)
-          .json({ message: "Essa música já está na fila." });
-      });
+        })
+        .catch((err) => {
+          console.log(err);
+          return res
+            .status(500)
+            .json({ message: "Erro ao tentar adicionar música a fila." });
+        });
+    }
   } else {
     return res.status(401).json({ message: "Não autorizado." });
   }
@@ -269,5 +287,23 @@ exports.removeTrackFromQueue = (req, res) => {
       });
   } else {
     return res.status(401).json({ message: "Ação negada." });
+  }
+};
+
+exports.refreshToken = (req, res) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    spotifyApi
+      .refreshAccessToken()
+      .then(() => {
+        return res.redirect("/spotify/getacesstoken");
+      })
+      .catch((err) => {
+        console.log(err);
+        return res
+          .status(500)
+          .json({ message: "Erro ao tentar atualizar token." });
+      });
+  } else {
+    return res.status(401).json({ message: "Não autorizado." });
   }
 };

@@ -3,16 +3,26 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="/css/register.css">
     <script src="https://use.fontawesome.com/releases/v5.3.0/js/all.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-    <h3>Registre-se na sala:</h3>
-    <form action="/spotify/guests/register" method="POST">
-        <input type="text" name="guest-name" id="guest-name" placeholder="Seu nome" required>
-        <button type="submit">Registrar</button>
-    </form>
+    <div class="container-fluid" style="padding-top: 4rem;">
+        <div class="row">
+            <div class="col-10 form-div">
+                <h3 style="font-size: 44px; margin-bottom: 1rem;">Registre-se na sala:</h3>
+                <form action="/spotify/guests/register" method="POST">
+                    <input type="text" name="guest-name" id="guest-name" placeholder="Seu nome" required>
+                    <br>
+                    <button type="submit" style="margin-top: 1rem;">Registrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

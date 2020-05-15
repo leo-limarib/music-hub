@@ -8,10 +8,10 @@ var notifyio = null;
  * @param {string} song the name of the song
  * @returns {Promise} reject if the song is already on the queue, resolve if is not.
  */
-songInQueue = (song) => {
+songInQueue = (songUri) => {
   return new Promise((resolve, reject) => {
     queue.forEach((music) => {
-      if (music.name == song && music.status == "ok") reject();
+      if (music.uri == songUri && music.status == "ok") reject();
     });
     resolve();
   });
@@ -35,12 +35,19 @@ removeFirstPlace = () => {
         })
         .catch((err) => {
           console.log(err);
+          api.skipToNext();
         });
     }
   } else {
     var api = spotify.getApi();
     process.env.STATUS = "off";
-    api.pause({ device_id: process.env.DEVICE });
+    api
+      .pause({ device_id: process.env.DEVICE })
+      .then(() => {})
+      .catch((err) => {
+        console.log(err);
+        api.pause();
+      });
   }
 };
 
@@ -63,7 +70,7 @@ play = () => {
 exports.add = (user, musicName, musicUri, musicDuration, coverUrl, artist) => {
   return new Promise((resolve, reject) => {
     if (queue.length <= SIZE) {
-      songInQueue(musicName)
+      songInQueue(musicUri)
         .then(() => {
           queue.push({
             user: user,
@@ -92,6 +99,10 @@ exports.add = (user, musicName, musicUri, musicDuration, coverUrl, artist) => {
   });
 };
 
+/**
+ * Get the song in queue[0]
+ * @returns {Object} {songName, user} or null.
+ */
 exports.nowPlaying = () => {
   if (queue.length > 0) {
     return { songName: queue[0].name, user: queue[0].user };
@@ -110,21 +121,25 @@ exports.setIo = (io) => {
       });
     }
   });
-
-  exports.removeSong = (songUri) => {
-    return new Promise((resolve, reject) => {
-      queue.forEach((song) => {
-        if (song.uri == songUri) {
-          song.status = "deleted";
-          notifyio.emit("playing", {
-            queue: queue,
-          });
-          resolve();
-        }
-      });
-      reject();
-    });
-  };
-
   console.log("io setted.");
+};
+
+/**
+ * Removes a song from the queue.
+ * @param {String} songUri the spotify uri for the song
+ * @returns {Promise} returns a promise, reject if the song was not found.
+ */
+exports.removeSong = (songUri) => {
+  return new Promise((resolve, reject) => {
+    queue.forEach((song) => {
+      if (song.uri == songUri) {
+        song.status = "deleted";
+        notifyio.emit("playing", {
+          queue: queue,
+        });
+        resolve();
+      }
+    });
+    reject();
+  });
 };

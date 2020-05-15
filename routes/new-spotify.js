@@ -122,6 +122,8 @@ class Spotify {
       "/queue/remove-from-queue",
       spotifyController.removeTrackFromQueue
     );
+
+    router.get("/spotify/refreshtoken", spotifyController.refreshToken);
   }
 }
 
