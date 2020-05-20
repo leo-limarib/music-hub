@@ -1,0 +1,24 @@
+body {
+  background-color: #363434 !important;
+  height: 100vh;
+  font-family: "Roboto", sans-serif;
+}
+
+.main-form {
+  margin: 1rem auto;
+  color: whitesmoke;
+  background-color: #5c5757;
+  padding: 1rem;
+  text-align: center;
+}
+
+#host-name,
+#host-password {
+  border: 0px;
+  background-color: #5c5757;
+  border-bottom: 1px solid #43e4ff;
+  color: whitesmoke;
+  font-size: 38px;
+  width: 50%;
+  margin: 0.5rem 0;
+}

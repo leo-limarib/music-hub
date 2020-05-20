@@ -3,18 +3,29 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/css/mediacontroller.css">
+    <link rel="stylesheet" href="/css/register-host.css">
     <script src="https://use.fontawesome.com/releases/v5.3.0/js/all.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-    <h4>Antes de inciar a sessão, por favor, apague a fila do spotify no device escolhido. (pq a api deles é uma merda)
-    </h4>
-    <h3>Hostear spotify:</h3>
-    <input type="text" name="host-name" id="host-name" placeholder="Seu nome">
-    <input type="password" name="host-password" id="host-password" placeholder="Senha host">
-    <script src="/scripts/spotify-auth.js"></script>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-8 main-form">
+                <h4 style="font-size: 38px;">Antes de inciar a sessão, por favor, apague a fila do spotify no device
+                    escolhido. (pq a api deles é
+                    uma merda)
+                </h4>
+                <h3 style="margin-top: 2rem; font-size: 42px;">Hostear spotify:</h3>
+                <input type="text" name="host-name" id="host-name" placeholder="Seu nome">
+                <br>
+                <input type="password" name="host-password" id="host-password" placeholder="Senha host">
+                <script src="/scripts/spotify-auth.js"></script>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
