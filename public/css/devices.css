@@ -1,4 +1,14 @@
+body {
+  height: 100vh;
+  background-color: #363434;
+  font-family: "Roboto", sans-serif;
+}
+
 .device-tab {
-  background: pink;
-  margin: 1rem;
+  background: #5c5757;
+  margin: 1rem auto;
+  width: 75%;
+  font-size: 38px;
+  color: whitesmoke;
+  padding: 1rem;
 }
