@@ -66,5 +66,5 @@ app.use("/", (req, res) => {
 
 mongoConnect(() => {
   server.listen(process.env.PORT, process.env.IP);
-  console.log(`Server running on: ${process.env.PORT}:${process.env.IP}`);
+  console.log(`Server running on: ${process.env.IP}:${process.env.PORT}`);
 });

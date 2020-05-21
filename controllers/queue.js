@@ -1,11 +1,7 @@
 var queue = [];
 var SIZE = 50;
 var notifyio = null;
-var api = null;
-
-exports.setApi = (capi) => {
-  api = capi;
-};
+const spotifyApi = require("../singletons/spotify-api").getApi();
 
 /**
  * Verify if the song is no the queue.
@@ -23,7 +19,7 @@ songInQueue = (songUri) => {
  */
 removeFirstPlace = (songUri) => {
   if (queue.length > 0 && queue[0].uri == songUri) {
-    api.pause({ device_id: process.env.DEVICE }, () => {
+    spotifyApi.api.pause({ device_id: process.env.DEVICE }, () => {
       queue.shift();
       if (queue.length > 0) {
         if (queue[0].status == "ok") {
@@ -34,6 +30,9 @@ removeFirstPlace = (songUri) => {
         }
       } else {
         process.env.STATUS = "off";
+        notifyio.emit("playing", {
+          queue: queue,
+        });
       }
     });
   }
@@ -43,7 +42,7 @@ play = () => {
   notifyio.emit("playing", {
     queue: queue,
   });
-  api
+  spotifyApi.api
     .play({ device_id: process.env.DEVICE, uris: [queue[0].uri] })
     .then(() => {
       setTimeout(removeFirstPlace, queue[0].duration, queue[0].uri);
@@ -137,6 +136,17 @@ exports.removeSong = (songUri) => {
   });
 };
 
+/**
+ * Skip the song (if theres a song playing)
+ */
 exports.skipSkong = () => {
   if (queue.length > 0) removeFirstPlace(queue[0].uri);
+};
+
+exports.reset = () => {
+  queue = [];
+  spotifyApi.api.pause({ device_id: process.env.DEVICE });
+  notifyio.emit("playing", {
+    queue: queue,
+  });
 };

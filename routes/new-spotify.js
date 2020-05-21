@@ -4,6 +4,8 @@ require("dotenv").config();
 const hostPassword = process.env.HOST_PASSWORD;
 const usersController = require("../controllers/users");
 const spotifyController = require("../controllers/spotify");
+const authController = require("../controllers/authentication");
+const spotifyApi = require("../singletons/spotify-api").getApi();
 
 class Spotify {
   constructor(io) {
@@ -16,34 +18,13 @@ class Spotify {
       usersController.registerUser
     );
 
-    /**
-     * Protection to the host page, password saved on .env file
-     * req.body.hostPassword
-     * req.body.hostName
-     */
-    router.post("/host", (req, res, next) => {
-      try {
-        if (req.body.hostPassword == hostPassword) {
-          const api = spotifyController.getApi();
-          const state = spotifyController.getState();
-          const scopes = spotifyController.getScopes();
-          var authorizeURL = api.createAuthorizeURL(scopes, state);
-          req.session.user = req.body.hostName;
-          req.session.type = "host";
-          return res.json({ url: authorizeURL });
-        } else {
-          return res.status(401).json({ message: "Senha de host inválida." });
-        }
-      } catch (e) {
-        console.log(e);
-        return res.status(500).json({
-          message: "Erro ao tentar autorizar aplicativo.",
-        });
-      }
-    });
+    router.post("/host", usersController.registerUser);
 
-    router.get("/master", (req, res) => {
-      if (req.session.user != undefined && req.session.type == "host") {
+    router.get(
+      "/master",
+      authController.authLogged,
+      authController.authHost,
+      (req, res) => {
         if (process.env.HOST != "null") {
           return res.render("spotify-master", {
             layout: false,
@@ -52,24 +33,22 @@ class Spotify {
             port: process.env.PORT,
           });
         } else {
-          var api = spotifyController.getApi();
-          var state = spotifyController.getState();
-          var scopes = spotifyController.getScopes();
-          var authorizeURL = api.createAuthorizeURL(scopes, state);
+          var authorizeURL = spotifyApi.api.createAuthorizeURL(
+            spotifyApi.scopes,
+            spotifyApi.state
+          );
           return res.redirect(authorizeURL);
         }
-      } else {
-        return res.render("register-guest", { layout: false });
       }
-    });
+    );
 
     router.get("/host", (req, res) => {
       if (process.env.HOST == "null") {
         if (req.session.user != undefined && req.session.type == "host") {
-          const api = spotifyController.getApi();
-          const state = spotifyController.getState();
-          const scopes = spotifyController.getScopes();
-          var authorizeURL = api.createAuthorizeURL(scopes, state);
+          var authorizeURL = spotifyApi.api.createAuthorizeURL(
+            spotifyApi.scopes,
+            spotifyApi.state
+          );
           return res.redirect(authorizeURL);
         } else return res.render("host-spotify", { layout: false });
       } else {
@@ -86,46 +65,86 @@ class Spotify {
     /**
      * Get the musichub api acess token using the code returned by the spotify api.
      */
-    router.get("/getacesstoken", spotifyController.getAccessToken);
+    router.get(
+      "/getacesstoken",
+      authController.authLogged,
+      authController.authHost,
+      usersController.getAccessToken
+    );
 
     /**
      * Get the artist albums
      * @param {string} artistId target artist id
      * @example 192.168.0.105:8080/spotify/artist/albums/f54hg64fg1s65adf
      */
-    router.get("/artist/albums/:artistId", spotifyController.getArtistAlbums);
+    router.get(
+      "/artist/albums/:artistId",
+      authController.authLogged,
+      spotifyController.getArtistAlbums
+    );
 
     /**
-     * Renders the select device screen (only host)
+     * List all the devices available in the host account.
      */
-    router.get("/devices/select", (req, res) => {
-      if (process.env.HOST == "null") {
-        return res.render("host-spotify", { layout: false });
-      } else {
-        if (req.session.type == "host")
+    router.get(
+      "/devices/select",
+      authController.authLogged,
+      authController.authHost,
+      (req, res) => {
+        if (process.env.HOST == "null") {
+          return res.render("host-spotify", { layout: false });
+        } else {
           return res.render("select-device", { layout: false });
-        else return res.redirect("/");
+        }
       }
-    });
+    );
 
-    router.post("/devices/:deviceId", spotifyController.setDevice);
+    router.post(
+      "/devices/:deviceId",
+      authController.authLogged,
+      authController.authHost,
+      spotifyController.setDevice
+    );
 
-    router.get("/devices", spotifyController.getAvailableDevices);
+    router.get(
+      "/devices",
+      authController.authLogged,
+      authController.authHost,
+      spotifyController.getAvailableDevices
+    );
 
-    router.post("/player/play/:deviceId", spotifyController.play);
+    router.get(
+      "/tracks/search/:trackName",
+      authController.authLogged,
+      spotifyController.searchTracks
+    );
 
-    router.get("/tracks/search/:trackName", spotifyController.searchTracks);
-
-    router.post("/queue/add-to-queue", spotifyController.addTrackToQueue);
+    router.post(
+      "/queue/add-to-queue",
+      authController.authLogged,
+      spotifyController.addTrackToQueue
+    );
 
     router.post(
       "/queue/remove-from-queue",
+      authController.authLogged,
+      authController.authHost,
       spotifyController.removeTrackFromQueue
     );
 
-    router.get("/refreshtoken", spotifyController.refreshToken);
+    router.get(
+      "/refreshtoken",
+      authController.authLogged,
+      authController.authHost,
+      usersController.refreshToken
+    );
 
-    router.put("/skipsong", spotifyController.skipSong);
+    router.put(
+      "/skipsong",
+      authController.authLogged,
+      authController.authHost,
+      spotifyController.skipSong
+    );
   }
 }
 

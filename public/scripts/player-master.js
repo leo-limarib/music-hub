@@ -48,7 +48,6 @@ function getMusicsByName(musicName) {
     success: (data) => {
       $("#tracks").empty();
       data.body.tracks.items.forEach((track) => {
-        console.log(track);
         $("#tracks").append(
           `<div class="container-fluid"><div class="row"><div class="col-4"><img src="${
             track.album.images[1].url
