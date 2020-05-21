@@ -44,3 +44,11 @@ hr {
   color: #43e4ff;
   margin: 1rem;
 }
+
+.skip-button {
+  font-size: 42px;
+  background-color: #5c5757;
+  color: #43e4ff;
+  padding: 0.5rem 2rem;
+  border: 0;
+}

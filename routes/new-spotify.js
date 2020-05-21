@@ -123,7 +123,9 @@ class Spotify {
       spotifyController.removeTrackFromQueue
     );
 
-    router.get("/spotify/refreshtoken", spotifyController.refreshToken);
+    router.get("/refreshtoken", spotifyController.refreshToken);
+
+    router.put("/skipsong", spotifyController.skipSong);
   }
 }
 

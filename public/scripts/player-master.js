@@ -100,6 +100,19 @@ function showConfiguration() {
   focusIcon($(".fa-cogs"), [$(".fa-search"), $(".fa-home")]);
 }
 
+function skipSong() {
+  $.ajax({
+    type: "PUT",
+    url: window.location.origin + `/spotify/skipsong`,
+    contentType: "application/json",
+    data: null,
+    dataType: "json",
+    success: (data) => {
+      console.log(data.message);
+    },
+  });
+}
+
 function showHome() {
   focusIcon($(".fa-home"), [$(".fa-search"), $(".fa-cogs")]);
   $("#main-body").empty();
@@ -110,10 +123,13 @@ function showHome() {
             <div class="row" style="padding: 2rem;">
                 <div class="col-5" id="now-cover">
                 </div>
-                <div class="col-7" style="padding: 0; text-align: left;">
+                <div class="col-5" style="padding: 0; text-align: left;">
                     <h2 id="now-playing" style="font-size: 48px; margin: 0;"></h2>
                     <h2 id="now-artist" style="font-size: 48px; margin: 0;"></h2>
                     <h2 id="now-user" style="font-size: 48px; margin: 0; color: #43E4FF;"></h2>
+                </div>
+                <div>
+                    <button onclick="skipSong()" class="skip-button"><i class="fas fa-forward"></i></button>
                 </div>
             </div>
         </div>

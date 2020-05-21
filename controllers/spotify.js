@@ -331,3 +331,12 @@ exports.refreshToken = (req, res) => {
     return res.status(401).json({ message: "Não autorizado." });
   }
 };
+
+exports.skipSong = (req, res) => {
+  if (req.session.user != undefined && req.session.type == "host") {
+    queueController.skipSkong();
+    return res.json({ message: "Música pulada com sucesso." });
+  } else {
+    res.status(401).json({ message: "Não autorizado." });
+  }
+};

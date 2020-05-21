@@ -21,20 +21,22 @@ songInQueue = (songUri) => {
 /**
  * Removes the music in the first place (called when the song is done playing)
  */
-removeFirstPlace = () => {
-  api.pause({ device_id: process.env.DEVICE }, () => {
-    queue.shift();
-    if (queue.length > 0) {
-      if (queue[0].status == "ok") {
-        play();
+removeFirstPlace = (songUri) => {
+  if (queue.length > 0 && queue[0].uri == songUri) {
+    api.pause({ device_id: process.env.DEVICE }, () => {
+      queue.shift();
+      if (queue.length > 0) {
+        if (queue[0].status == "ok") {
+          play();
+        } else {
+          console.log(`PULANDO MÚSICA: ${queue[0].name}`);
+          removeFirstPlace(queue[0].uri);
+        }
       } else {
-        console.log(`PULANDO MÚSICA: ${queue[0].name}`);
-        removeFirstPlace();
+        process.env.STATUS = "off";
       }
-    } else {
-      process.env.STATUS = "off";
-    }
-  });
+    });
+  }
 };
 
 play = () => {
@@ -44,7 +46,7 @@ play = () => {
   api
     .play({ device_id: process.env.DEVICE, uris: [queue[0].uri] })
     .then(() => {
-      setTimeout(removeFirstPlace, queue[0].duration);
+      setTimeout(removeFirstPlace, queue[0].duration, queue[0].uri);
     })
     .catch((err) => {
       console.log(err);
@@ -98,6 +100,10 @@ exports.nowPlaying = () => {
   }
 };
 
+/**
+ * Set the io connection.
+ * @param {Object} io the io connection object
+ */
 exports.setIo = (io) => {
   notifyio = io;
 
@@ -129,4 +135,8 @@ exports.removeSong = (songUri) => {
     });
     reject();
   });
+};
+
+exports.skipSkong = () => {
+  if (queue.length > 0) removeFirstPlace(queue[0].uri);
 };
