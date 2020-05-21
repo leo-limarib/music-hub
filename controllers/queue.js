@@ -1,7 +1,11 @@
-var spotify = require("./spotify");
 var queue = [];
 var SIZE = 50;
 var notifyio = null;
+var api = null;
+
+exports.setApi = (capi) => {
+  api = capi;
+};
 
 /**
  * Verify if the song is no the queue.
@@ -10,9 +14,6 @@ var notifyio = null;
  */
 songInQueue = (songUri) => {
   return new Promise((resolve, reject) => {
-    queue.forEach((music) => {
-      if (music.uri == songUri && music.status == "ok") reject();
-    });
     resolve();
   });
 };
@@ -21,41 +22,33 @@ songInQueue = (songUri) => {
  * Removes the music in the first place (called when the song is done playing)
  */
 removeFirstPlace = () => {
-  queue.shift();
-  if (queue.length > 0) {
-    if (queue[0].status == "ok") {
-      play();
+  api.pause({ device_id: process.env.DEVICE }, () => {
+    queue.shift();
+    if (queue.length > 0) {
+      if (queue[0].status == "ok") {
+        play();
+      } else {
+        console.log(`PULANDO MÚSICA: ${queue[0].name}`);
+        removeFirstPlace();
+      }
     } else {
-      console.log(`PULANDO MÚSICA: ${queue[0].name}`);
-      var api = spotify.getApi();
-      api
-        .skipToNext()
-        .then(() => {
-          removeFirstPlace();
-        })
-        .catch((err) => {
-          console.log(err);
-          api.skipToNext();
-        });
+      process.env.STATUS = "off";
     }
-  } else {
-    var api = spotify.getApi();
-    process.env.STATUS = "off";
-    api
-      .pause({ device_id: process.env.DEVICE })
-      .then(() => {})
-      .catch((err) => {
-        console.log(err);
-        api.pause();
-      });
-  }
+  });
 };
 
 play = () => {
   notifyio.emit("playing", {
     queue: queue,
   });
-  setTimeout(removeFirstPlace, queue[0].duration);
+  api
+    .play({ device_id: process.env.DEVICE, uris: [queue[0].uri] })
+    .then(() => {
+      setTimeout(removeFirstPlace, queue[0].duration);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /**
@@ -67,34 +60,28 @@ play = () => {
  * @example add({uri: "adsuahd1j901ce09", duration: 240000})
  * @returns {Promise} returns a promise
  */
-exports.add = (user, musicName, musicUri, musicDuration, coverUrl, artist) => {
+exports.add = (user, name, songUri, duration, coverUrl, artist) => {
   return new Promise((resolve, reject) => {
     if (queue.length <= SIZE) {
-      songInQueue(musicUri)
-        .then(() => {
-          queue.push({
-            user: user,
-            name: musicName,
-            uri: musicUri,
-            duration: musicDuration, //delay to sinchronize with player
-            coverUrl: coverUrl,
-            artist: artist,
-            status: "ok",
-          });
-          notifyio.emit("playing", {
-            queue: queue,
-          });
-          if (queue.length == 1) {
-            play();
-          }
-          resolve();
-        })
-        .catch(() => {
-          console.log("Essa música já está na fila.");
-          reject();
-        });
+      queue.push({
+        user: user,
+        name: name,
+        uri: songUri,
+        duration: duration - 500, //delay to sinchronize with player
+        coverUrl: coverUrl,
+        artist: artist,
+        status: "ok",
+      });
+      notifyio.emit("playing", {
+        queue: queue,
+      });
+      if (queue.length == 1) {
+        play();
+        resolve("Sessão inicializada com sucesso.");
+      }
+      resolve("Música adicionada a fila com sucesso.");
     } else {
-      reject();
+      reject("A fila está no tamanho máximo.");
     }
   });
 };

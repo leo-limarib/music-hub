@@ -70,6 +70,7 @@ exports.getAccessToken = (req, res) => {
       );
 
       process.env.HOST = "Unkown";
+      queueController.setApi(spotifyApi);
       return res.redirect("/spotify/devices/select");
     },
     function (err) {
@@ -189,6 +190,28 @@ exports.searchTracks = (req, res) => {
  * @returns {Object} Returns a json with a message (error or sucess).
  */
 exports.addTrackToQueue = (req, res) => {
+  //TESTING OUT
+  queueController
+    .add(
+      req.session.user,
+      req.body.songName,
+      req.body.songUri,
+      req.body.durationMs,
+      req.body.coverUrl,
+      req.body.artist
+    )
+    .then((msg) => {
+      process.env.STATUS = "on";
+      return res.json({ message: msg });
+    })
+    .catch((err) => {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ message: "Erro ao tentar inicializar sessão." });
+    });
+
+  /*
   if (req.session.user != undefined) {
     if (process.env.STATUS == "off") {
       return spotifyApi
@@ -267,6 +290,7 @@ exports.addTrackToQueue = (req, res) => {
   } else {
     return res.status(401).json({ message: "Não autorizado." });
   }
+  */
 };
 
 /**

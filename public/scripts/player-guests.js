@@ -39,12 +39,12 @@ function getMusicsByName(musicName) {
           } <br>${
             track.artists[0].name
           }</div><div class="col-2"><button class="queue-button" onclick="selectTrack('${track.name.replace(
-            /[^a-zA-Z ]/g,
+            /[&\/\\#,+()$~%.'":*?<>{}]/g,
             ""
           )}', '${track.uri}', '${track.duration_ms}', '${
             track.album.images[1].url
           }', '${track.artists[0].name.replace(
-            /[^a-zA-Z ]/g,
+            /[&\/\\#,+()$~%.'":*?<>{}]/g,
             ""
           )}')"><i class="far fa-share-square"></i></button></div></div><hr></div>`
         );
