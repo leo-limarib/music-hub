@@ -149,4 +149,8 @@ exports.reset = () => {
   notifyio.emit("playing", {
     queue: queue,
   });
+  process.env.STATUS = "off";
+  process.env.NOW_PLAYING = "null";
+  process.env.DEVICE = "null";
+  process.env.HOST = "null";
 };

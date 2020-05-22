@@ -145,6 +145,13 @@ class Spotify {
       authController.authHost,
       spotifyController.skipSong
     );
+
+    router.put(
+      "/resetserver",
+      authController.authLogged,
+      authController.authHost,
+      spotifyController.resetServer
+    );
   }
 }
 

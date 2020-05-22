@@ -87,14 +87,36 @@ function focusIcon(focus, notfocus) {
   focus.css("color", "#43E4FF");
 }
 
+function resetServer() {
+  if (
+    window.confirm(
+      "Tem certeza de que deseja reiniciar o servidor? Isso irá apagar todas as músicas da fila."
+    )
+  ) {
+    $.ajax({
+      type: "PUT",
+      url: window.location.origin + `/spotify/resetserver`,
+      contentType: "application/json",
+      data: null,
+      dataType: "json",
+      success: (data) => {
+        alert(data.message);
+      },
+      error: (err) => {
+        alert(err.responseJSON.message);
+      },
+    });
+  }
+}
+
 function showConfiguration() {
   $("#main-body").empty();
   $("#main-body").append(`
   <p style="font-size: 52px; color: white; margin: 0; margin-left: 1rem;">Link para convidados:</p>
-  <p id="guests-url" style="font-size: 40px; color: white; margin: 0; margin-left: 1rem;"></p>
+  <p id="guests-url" style="font-size: 40px; color: white; margin: 4rem 1rem;"></p>
   <a style="font-size: 40px; color: white;" href="${
     window.location.origin + "/spotify/refreshtoken"
-  }">Atualizar token de acesso.</a>`);
+  }">Atualizar token de acesso.</a><br><button onclick="resetServer()" style="font-size: 40px; margin: 4rem 1rem;">Resetar server <i class="fas fa-redo-alt"></i></button>`);
   getInviteUrl();
   focusIcon($(".fa-cogs"), [$(".fa-search"), $(".fa-home")]);
 }

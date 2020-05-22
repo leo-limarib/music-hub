@@ -131,11 +131,8 @@ exports.skipSong = (req, res) => {
  */
 exports.resetServer = (req, res) => {
   try {
-    process.env.STATUS = "off";
-    process.env.NOW_PLAYING = "null";
-    process.env.DEVICE = "null";
     queueController.reset();
-    return res.json({ message: "Servidor reiniciado com sucesso." });
+    return res.redirect("/spotify/master");
   } catch (e) {
     return res
       .status(500)
