@@ -77,7 +77,7 @@ exports.registerUser = (req, res) => {
  */
 exports.registerHost = (req, res) => {
   try {
-    if (req.body.hostPassword == hostPassword) {
+    if (req.body.hostPassword == process.env.HOST_PASSWORD) {
       var authorizeURL = spotifyApi.api.createAuthorizeURL(
         spotifyApi.scopes,
         spotifyApi.state

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 require("dotenv").config();
-const hostPassword = process.env.HOST_PASSWORD;
+const navigationController = require("../controllers/navigation");
 const usersController = require("../controllers/users");
 const spotifyController = require("../controllers/spotify");
 const authController = require("../controllers/authentication");
@@ -18,7 +18,7 @@ class Spotify {
       usersController.registerUser
     );
 
-    router.post("/host", usersController.registerUser);
+    router.post("/host", usersController.registerHost);
 
     router.get(
       "/master",
@@ -80,7 +80,7 @@ class Spotify {
     router.get(
       "/artist/albums/:artistId",
       authController.authLogged,
-      spotifyController.getArtistAlbums
+      navigationController.getArtistAlbums
     );
 
     /**
@@ -116,7 +116,7 @@ class Spotify {
     router.get(
       "/tracks/search/:trackName",
       authController.authLogged,
-      spotifyController.searchTracks
+      navigationController.searchTracks
     );
 
     router.post(

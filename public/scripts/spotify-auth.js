@@ -9,7 +9,7 @@ function authorizeApp(hostPassword, hostName) {
       window.location.replace(data.url);
     },
     error: (err) => {
-      alert(err.responseJSON.message);
+      console.log(err);
     },
   });
 }
